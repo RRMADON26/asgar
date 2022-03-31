@@ -12,8 +12,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static model.StatusKind.BOOKED;
-import static model.StatusKind.CANCELLED;
+import static model.enumiration.StatusKind.BOOKED;
+import static model.enumiration.StatusKind.CANCELLED;
 
 public class Controller {
 

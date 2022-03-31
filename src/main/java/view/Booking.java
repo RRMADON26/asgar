@@ -28,10 +28,10 @@ import static controller.Controller.getBarber;
 import static controller.Controller.getBooking;
 import static controller.Controller.getCategoryServices;
 import static controller.Controller.getTime;
-import static model.StatusKind.CANCELLED;
-import static model.StatusKind.CONFIRM;
+import static model.enumiration.StatusKind.CANCELLED;
+import static model.enumiration.StatusKind.CONFIRM;
 
-public class BookingForm {
+public class Booking {
 	private JTextField nameTextField;
 	private JTextField mobileNumberTextField;
 	private JTextField dateTimeTextField;
@@ -51,7 +51,7 @@ public class BookingForm {
 	private JTextField search;
 	private JButton searchButton;
 
-	public BookingForm() {
+	public Booking() {
 		//formating date
 		String pattern = "MM-dd-yyyy";
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
@@ -224,7 +224,7 @@ public class BookingForm {
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("BookingForm");
 
-		frame.setContentPane(new BookingForm().panel);
+		frame.setContentPane(new Booking().panel);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setVisible(true);

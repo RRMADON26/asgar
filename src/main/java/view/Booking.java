@@ -210,6 +210,14 @@ public class Booking {
 				jTable.setModel(bookingTableModel[0]);
 			}
 		});
+
+		clearButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				nameTextField.setText("");
+				mobileNumberTextField.setText("");
+			}
+		});
 	}
 
 	public static void main(String[] args) {

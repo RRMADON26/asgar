@@ -1,6 +1,5 @@
 import controller.Controller;
 import model.Book;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

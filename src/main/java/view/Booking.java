@@ -144,9 +144,7 @@ public class Booking {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
 				if ("date".equals(e.getPropertyName())) {
-//					from.setDateTime(simpleDateFormat.format(Date.from(jDateChooser1.getDate().toInstant())) + " " + timeComboBox.getSelectedItem());
 					date[0] = simpleDateFormat.format(Date.from(jDateChooser1.getDate().toInstant()));
-					System.out.println(date[0]);
 				}
 
 			}
@@ -159,9 +157,6 @@ public class Booking {
 		timeComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				from.setDateTime(from.getDateTime() + " " + timeComboBox.getSelectedItem());
-//				System.out.println(from.getDateTime());
-
 				time[0] = timeComboBox.getSelectedItem().toString();
 			}
 		});

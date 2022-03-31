@@ -12,6 +12,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static model.StatusKind.BOOKED;
+import static model.StatusKind.CANCELLED;
+
 public class Controller {
 
 	private static Connection connection;
@@ -20,13 +23,19 @@ public class Controller {
 
 	private static ResultSet resultSet;
 
-	public static void addBooking(Book to) throws SQLException {
+	/**
+	 * Add booking after passed validation
+	 *
+	 * @param book
+	 * @throws SQLException
+	 */
+	public static void addBooking(Book book) throws SQLException {
 
 		try {
 			connection = Connect.toDb();
 			statement = connection.createStatement();
 
-			String insert = "INSERT INTO Book values(null ,'" + to.getCode() + "','" + to.getDateTime() + "' , '" + to.getMobileNumber() + "' , '" + to.getName() + "' , 'Book','" + to.getBarbedId() + "','" + to.getServiceId() + "')";
+			String insert = "INSERT INTO Book values(null ,'" + book.getCode() + "','" + book.getDateTime() + "' , '" + book.getMobileNumber() + "' , '" + book.getName() + "' , '" + BOOKED.name() + "','" + book.getBarbedId() + "','" + book.getServiceId() + "')";
 
 			statement.execute(insert);
 
@@ -37,6 +46,11 @@ public class Controller {
 		}
 	}
 
+	/**
+	 * Getting all booking
+	 *
+	 * @return List of View Booking
+	 */
 	public static List<Book.VBook> getBooking() {
 		List<Book.VBook> bookingList = new ArrayList<>();
 
@@ -72,6 +86,11 @@ public class Controller {
 		return bookingList;
 	}
 
+	/**
+	 * Getting all Barber
+	 *
+	 * @return List of Barber
+	 */
 	public static List<Barber> getBarber() {
 		List<Barber> barberList = new ArrayList<>();
 
@@ -98,6 +117,11 @@ public class Controller {
 		return barberList;
 	}
 
+	/**
+	 * Getting all Category Service
+	 *
+	 * @return List of Category Service
+	 */
 	public static List<CategoryService> getCategoryServices() {
 		List<CategoryService> categoryServiceList = new ArrayList<>();
 
@@ -126,6 +150,12 @@ public class Controller {
 		return categoryServiceList;
 	}
 
+	/**
+	 * Update status Booking to CONFIRM or CANCELLED
+	 *
+	 * @param statusBooking
+	 * @param code
+	 */
 	public static void updateStatus(String statusBooking, String code) {
 		try {
 			connection = Connect.toDb();
@@ -140,24 +170,85 @@ public class Controller {
 		}
 	}
 
-	public static boolean getAvailableBookingByDate(String dateTime) {
+	/**
+	 * Check booking is existed or not in the same time
+	 *
+	 * @param dateTime
+	 * @param barber
+	 * @return boolean
+	 */
+	public static boolean getAvailableBookingByDateAndBarber(String dateTime, int barber) {
 
-//		try {
-//			connection = Connect.toDb();
-//			statement = connection.createStatement();
-//			resultSet = statement.executeQuery("SELECT * FROM Book WHERE dateTime = '"+dateTime+"' ");
-//
-//			resultSet.last();
-//
-//			System.out.println(resultSet.getRow());
-//			statement.close();
-//			connection.close();
-//
+		try {
+			connection = Connect.toDb();
+			statement = connection.createStatement();
+			resultSet = statement.executeQuery("SELECT count(*) as recordCount FROM Book WHERE dateTime = '" + dateTime + "' AND  barberName_id = '" + barber + "' AND status != '" + CANCELLED.name() + "'");
 
+			while (resultSet.next()) {
+				if (resultSet.getInt("recordCount") >= 1) {
+					statement.close();
+					connection.close();
+					return false;
+
+				}
+			}
+
+			statement.close();
+			connection.close();
+
+		} catch (SQLException sqlException) {
+			sqlException.printStackTrace();
+		}
 
 		return true;
 	}
 
+	/**
+	 * Search By Name
+	 *
+	 * @param name
+	 * @return List of View Booking
+	 */
+	public static List<Book.VBook> search(String name) {
+		List<Book.VBook> bookingList = new ArrayList<>();
+
+		try {
+			connection = Connect.toDb();
+			statement = connection.createStatement();
+			resultSet = statement.executeQuery
+					("SELECT  b.* , c.name as barberName , d.name as categoryServiceName FROM Book b " +
+							"join Barber c on c.id = b.barberName_id " +
+							"join CategoryService d on b.categoryService_id = d.id WHERE  b.name LIKE '%" + name + "%'");
+
+			while (resultSet.next()) {
+				Book.VBook data = new Book.VBook(
+						resultSet.getInt("id"),
+						resultSet.getString("code"),
+						resultSet.getString("name"),
+						resultSet.getString("dateTime"),
+						resultSet.getString("mobileNumber"),
+						resultSet.getString("status"),
+						resultSet.getString("barberName"),
+						resultSet.getString("categoryServiceName"));
+
+				bookingList.add(data);
+
+			}
+
+			statement.close();
+			connection.close();
+		} catch (SQLException throwables) {
+			throwables.printStackTrace();
+		}
+
+		return bookingList;
+	}
+
+	/**
+	 * List of time
+	 *
+	 * @return Arrays String
+	 */
 	public static String[] getTime() {
 		return new String[]{
 				"1:00 PM",

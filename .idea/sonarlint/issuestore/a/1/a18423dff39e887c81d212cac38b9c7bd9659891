@@ -1,0 +1,50 @@
+
+D
+java:S3740("/Provide the parametrized type for this generic.(ˆòíX
+J
+java:S37400"/Provide the parametrized type for this generic.(î„¶´øÿÿÿÿ
+E
+java:S3740z"/Provide the parametrized type for this generic.(¤™Ô¶
+F
+java:S3740ˆ"/Provide the parametrized type for this generic.(¤™Ô¶
+m
+java:S37766"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(…í¿çûÿÿÿÿ
+S	java:S106a"9Replace this use of System.out or System.err by a logger.(Ìó½Åıÿÿÿÿ
+S	java:S106d"9Replace this use of System.out or System.err by a logger.(…®Û–şÿÿÿÿ
+W	java:S125—"<This block of commented-out lines of code should be removed.(ñƒ®üÿÿÿÿ
+T	java:S106™"9Replace this use of System.out or System.err by a logger.(Ì…×Ïúÿÿÿÿ
+W	java:S125¦"<This block of commented-out lines of code should be removed.(Îô…‰øÿÿÿÿ
+V
+java:S1117´":Rename "jTable" which hides the field declared at line 47.(íªÀöùÿÿÿÿ
+`
+java:S3252ä"IUse static access with "javax.swing.WindowConstants" for "EXIT_ON_CLOSE".(¢¡´
+@
+java:S1948ş"*Make "bookList" transient or serializable.(â€r
+?
+java:S1185µ"(Remove this method to simply inherit it.(›«¢ö
+P
+java:S1068%"5Remove this unused "dateTimeTextField" private field.(Ğ¦Éÿÿÿÿÿ
+J
+java:S1068)"/Remove this unused "clearButton" private field.(úñ•“şÿÿÿÿ
+H
+java:S1068+"-Remove this unused "nameLabel" private field.(ü‡†æüÿÿÿÿ
+P
+java:S1068,"5Remove this unused "mobileNumberLabel" private field.(€¬áøøÿÿÿÿ
+J
+java:S1068-"/Remove this unused "barberLabel" private field.(Ï¶Ìÿÿÿÿÿ
+E
+java:S1068."/Remove this unused "jScrollPane" private field.(õÀŠ†
+C
+java:S1604Q"(Make this anonymous inner class a lambda(Ï¹ÿîúÿÿÿÿ
+>
+java:S1604w"(Make this anonymous inner class a lambda(ÇØÖã
+D
+java:S1604…"(Make this anonymous inner class a lambda(ôÙ¼Ñıÿÿÿÿ
+>
+java:S1604“"(Make this anonymous inner class a lambda(éâÍT
+D
+java:S1604£"(Make this anonymous inner class a lambda(ò¹ûØúÿÿÿÿ
+?
+java:S1604Ì"(Make this anonymous inner class a lambda(êÑ…œ
+>
+java:S1604×"(Make this anonymous inner class a lambda(õïD

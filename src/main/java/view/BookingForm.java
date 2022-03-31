@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
@@ -22,11 +23,13 @@ import java.util.List;
 import java.util.UUID;
 
 import static controller.Controller.addBooking;
-import static controller.Controller.getAvailableBookingByDate;
+import static controller.Controller.getAvailableBookingByDateAndBarber;
 import static controller.Controller.getBarber;
 import static controller.Controller.getBooking;
 import static controller.Controller.getCategoryServices;
 import static controller.Controller.getTime;
+import static model.StatusKind.CANCELLED;
+import static model.StatusKind.CONFIRM;
 
 public class BookingForm {
 	private JTextField nameTextField;
@@ -44,39 +47,64 @@ public class BookingForm {
 	private JTable jTable;
 	private JComboBox timeComboBox;
 	private JDateChooser jDateChooser1;
+	private JButton printButton;
+	private JTextField search;
+	private JButton searchButton;
 
 	public BookingForm() {
+		//formating date
 		String pattern = "MM-dd-yyyy";
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+		final String[] date = {null};
+		final String[] time = {null};
 
+		// create instance for Book
 		Book from = new Book();
 
+		//set default data
 		from.setServiceId(1);
 		from.setBarbedId(1);
-		from.setDateTime(simpleDateFormat.format(new Date()));
+		from.setDateTime(simpleDateFormat.format(new Date()) + " " + Controller.getTime()[0]);
 
+		//define table
 		final BookingTableModel[] bookingTableModel = {new BookingTableModel(getBooking())};
 
 		jTable.setModel(bookingTableModel[0]);
+		jTable.getAutoCreateRowSorter();
 
 		initialComponent();
 
+		/**
+		 * Override button action
+		 * This button used for send data to controller
+		 */
 		submitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+
+				if(date[0] == null) date[0] = simpleDateFormat.format(new Date());
+				if(time[0] == null) time[0] = Controller.getTime()[0];
+
 				try {
-					if (!getAvailableBookingByDate(from.getDateTime())) {
+					String dateTime = date[0] + " " + time[0];
+					if (!getAvailableBookingByDateAndBarber(dateTime, from.getBarbedId())) {
 						JOptionPane.showMessageDialog(null, "Not Available");
 					} else {
 						from.setCode(UUID.randomUUID().toString());
 						from.setMobileNumber(mobileNumberTextField.getText());
 						from.setName(nameTextField.getText());
+						from.setDateTime(dateTime);
+						System.out.println(from.getDateTime());
 
 						addBooking(from);
 						System.out.println("Successfully add booking ");
-						bookingTableModel[0] = new BookingTableModel(getBooking());
-						jTable.setModel(bookingTableModel[0]);
+
 					}
+
+					jTable.revalidate();
+
+					bookingTableModel[0] = new BookingTableModel(getBooking());
+					jTable.setModel(bookingTableModel[0]);
 
 
 				} catch (SQLException ex) {
@@ -85,6 +113,9 @@ public class BookingForm {
 			}
 		});
 
+		/**
+		 * capture value when select combo box barber
+		 */
 		barberComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -96,6 +127,9 @@ public class BookingForm {
 			}
 		});
 
+		/**
+		 * capture value when select combo box category service
+		 */
 		serviceComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -107,23 +141,38 @@ public class BookingForm {
 			}
 		});
 
+		/**
+		 * capture value when select Date
+		 */
 		jDateChooser1.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
 				if ("date".equals(e.getPropertyName())) {
-					from.setDateTime(simpleDateFormat.format(Date.from(jDateChooser1.getDate().toInstant())));
+//					from.setDateTime(simpleDateFormat.format(Date.from(jDateChooser1.getDate().toInstant())) + " " + timeComboBox.getSelectedItem());
+					date[0] = simpleDateFormat.format(Date.from(jDateChooser1.getDate().toInstant()));
+					System.out.println(date[0]);
 				}
+
 			}
 
 		});
 
+		/**
+		 * capture value when select combo box "time"
+		 */
 		timeComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				from.setDateTime(from.getDateTime() + " " + timeComboBox.getSelectedItem());
+//				from.setDateTime(from.getDateTime() + " " + timeComboBox.getSelectedItem());
+//				System.out.println(from.getDateTime());
+
+				time[0] = timeComboBox.getSelectedItem().toString();
 			}
 		});
 
+		/**
+		 * when double click from "mouse" we need to capture id and show Option Dialog
+		 */
 		jTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -132,13 +181,13 @@ public class BookingForm {
 
 					String[] options = {"Confirm", "Cancel Booking", "Quit"};
 
-					int result = JOptionPane.showOptionDialog(null, "Are you want to ?", "Confirmation booking",
+					int result = JOptionPane.showOptionDialog(null, "Are you want to ?", "Confirmation Booking",
 							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
 							null, options, null);
 					if (result == JOptionPane.YES_OPTION) {
-						Controller.updateStatus("CONFIRM", jTable.getValueAt(jTable.getSelectedRow(), 0).toString());
+						Controller.updateStatus(CONFIRM.name(), jTable.getValueAt(jTable.getSelectedRow(), 0).toString());
 					} else if (result == JOptionPane.NO_OPTION) {
-						Controller.updateStatus("CANCELLED", jTable.getValueAt(jTable.getSelectedRow(), 0).toString());
+						Controller.updateStatus(CANCELLED.name(), jTable.getValueAt(jTable.getSelectedRow(), 0).toString());
 					}
 
 				}
@@ -146,10 +195,30 @@ public class BookingForm {
 				bookingTableModel[0] = new BookingTableModel(getBooking());
 				jTable.setModel(bookingTableModel[0]);
 
-
 			}
 		});
 
+		/**
+		 * this button used to print data from Table
+		 */
+		printButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					jTable.print(JTable.PrintMode.FIT_WIDTH, null, null);
+				} catch (PrinterException ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+
+		searchButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				bookingTableModel[0] = new BookingTableModel(Controller.search(search.getText()));
+				jTable.setModel(bookingTableModel[0]);
+			}
+		});
 	}
 
 	public static void main(String[] args) {
@@ -162,17 +231,23 @@ public class BookingForm {
 	}
 
 	private void initialComponent() {
+		// get all barber from controller
 		DefaultComboBoxModel<Barber> barberDefaultComboBoxModel = new DefaultComboBoxModel<>(getBarber().toArray(new Barber[0]));
 
 		barberComboBox.setModel(barberDefaultComboBoxModel);
+		// get all category service from controller
 		DefaultComboBoxModel<CategoryService> categoryServiceDefaultComboBoxModel = new DefaultComboBoxModel<>(getCategoryServices().toArray(new CategoryService[0]));
 
 		serviceComboBox.setModel(categoryServiceDefaultComboBoxModel);
 
+		// get all "time" from controller
 		DefaultComboBoxModel<String> timDefaultComboBoxModel = new DefaultComboBoxModel<>(getTime());
 		timeComboBox.setModel(timDefaultComboBoxModel);
 	}
 
+	/**
+	 * setup layout table
+	 */
 	private static class BookingTableModel extends AbstractTableModel {
 		private final String[] columnNames = {"Code", "Name", "Date Time", "Mobile Number", "Status", "Barber Name", "Service"};
 
@@ -236,6 +311,9 @@ public class BookingForm {
 		}
 	}
 
+	/**
+	 * pre define JdateChooser Component
+	 */
 	public void createUIComponents() {
 		jDateChooser1 = new JDateChooser(Date.from(Instant.now()));
 		jDateChooser1.setDateFormatString("dd MMMM yyyy");

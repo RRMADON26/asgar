@@ -22,12 +22,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static controller.Controller.addBooking;
-import static controller.Controller.getAvailableBookingByDateAndBarber;
-import static controller.Controller.getBarber;
-import static controller.Controller.getBooking;
-import static controller.Controller.getCategoryServices;
-import static controller.Controller.getTime;
 import static model.enumiration.StatusKind.CANCELLED;
 import static model.enumiration.StatusKind.CONFIRM;
 
@@ -50,8 +44,10 @@ public class Booking {
 	private JButton printButton;
 	private JTextField search;
 	private JButton searchButton;
+	private Controller controller = new Controller();
 
 	public Booking() {
+
 		//formating date
 		String pattern = "MM-dd-yyyy";
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
@@ -64,10 +60,10 @@ public class Booking {
 		//set default data
 		from.setServiceId(1);
 		from.setBarbedId(1);
-		from.setDateTime(simpleDateFormat.format(new Date()) + " " + Controller.getTime()[0]);
+		from.setDateTime(simpleDateFormat.format(new Date()) + " " + controller.getTime()[0]);
 
 		//define table
-		final BookingTableModel[] bookingTableModel = {new BookingTableModel(getBooking())};
+		final BookingTableModel[] bookingTableModel = {new BookingTableModel(controller.getBooking())};
 
 		jTable.setModel(bookingTableModel[0]);
 		jTable.getAutoCreateRowSorter();
@@ -82,12 +78,12 @@ public class Booking {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				if(date[0] == null) date[0] = simpleDateFormat.format(new Date());
-				if(time[0] == null) time[0] = Controller.getTime()[0];
+				if (date[0] == null) date[0] = simpleDateFormat.format(new Date());
+				if (time[0] == null) time[0] = controller.getTime()[0];
 
 				try {
 					String dateTime = date[0] + " " + time[0];
-					if (!getAvailableBookingByDateAndBarber(dateTime, from.getBarbedId())) {
+					if (!controller.getAvailableBookingByDateAndBarber(dateTime, from.getBarbedId())) {
 						JOptionPane.showMessageDialog(null, "Not Available");
 					} else {
 						from.setCode(UUID.randomUUID().toString());
@@ -96,14 +92,14 @@ public class Booking {
 						from.setDateTime(dateTime);
 						System.out.println(from.getDateTime());
 
-						addBooking(from);
+						controller.addBooking(from);
 						System.out.println("Successfully add booking ");
 
 					}
 
 					jTable.revalidate();
 
-					bookingTableModel[0] = new BookingTableModel(getBooking());
+					bookingTableModel[0] = new BookingTableModel(controller.getBooking());
 					jTable.setModel(bookingTableModel[0]);
 
 
@@ -185,14 +181,14 @@ public class Booking {
 							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
 							null, options, null);
 					if (result == JOptionPane.YES_OPTION) {
-						Controller.updateStatus(CONFIRM.name(), jTable.getValueAt(jTable.getSelectedRow(), 0).toString());
+						controller.updateStatus(CONFIRM.name(), jTable.getValueAt(jTable.getSelectedRow(), 0).toString());
 					} else if (result == JOptionPane.NO_OPTION) {
-						Controller.updateStatus(CANCELLED.name(), jTable.getValueAt(jTable.getSelectedRow(), 0).toString());
+						controller.updateStatus(CANCELLED.name(), jTable.getValueAt(jTable.getSelectedRow(), 0).toString());
 					}
 
 				}
 
-				bookingTableModel[0] = new BookingTableModel(getBooking());
+				bookingTableModel[0] = new BookingTableModel(controller.getBooking());
 				jTable.setModel(bookingTableModel[0]);
 
 			}
@@ -215,7 +211,7 @@ public class Booking {
 		searchButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				bookingTableModel[0] = new BookingTableModel(Controller.search(search.getText()));
+				bookingTableModel[0] = new BookingTableModel(controller.search(search.getText()));
 				jTable.setModel(bookingTableModel[0]);
 			}
 		});
@@ -232,16 +228,16 @@ public class Booking {
 
 	private void initialComponent() {
 		// get all barber from controller
-		DefaultComboBoxModel<Barber> barberDefaultComboBoxModel = new DefaultComboBoxModel<>(getBarber().toArray(new Barber[0]));
+		DefaultComboBoxModel<Barber> barberDefaultComboBoxModel = new DefaultComboBoxModel<>(controller.getBarber().toArray(new Barber[0]));
 
 		barberComboBox.setModel(barberDefaultComboBoxModel);
 		// get all category service from controller
-		DefaultComboBoxModel<CategoryService> categoryServiceDefaultComboBoxModel = new DefaultComboBoxModel<>(getCategoryServices().toArray(new CategoryService[0]));
+		DefaultComboBoxModel<CategoryService> categoryServiceDefaultComboBoxModel = new DefaultComboBoxModel<>(controller.getCategoryServices().toArray(new CategoryService[0]));
 
 		serviceComboBox.setModel(categoryServiceDefaultComboBoxModel);
 
 		// get all "time" from controller
-		DefaultComboBoxModel<String> timDefaultComboBoxModel = new DefaultComboBoxModel<>(getTime());
+		DefaultComboBoxModel<String> timDefaultComboBoxModel = new DefaultComboBoxModel<>(controller.getTime());
 		timeComboBox.setModel(timDefaultComboBoxModel);
 	}
 

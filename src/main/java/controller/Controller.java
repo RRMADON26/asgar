@@ -29,7 +29,7 @@ public class Controller {
 	 * @param book
 	 * @throws SQLException
 	 */
-	public static void addBooking(Book book) throws SQLException {
+	public Book addBooking(Book book) throws SQLException {
 
 		try {
 			connection = Connect.toDb();
@@ -44,6 +44,8 @@ public class Controller {
 		} catch (SQLException throwables) {
 			throwables.printStackTrace();
 		}
+
+		return book;
 	}
 
 	/**
@@ -51,7 +53,7 @@ public class Controller {
 	 *
 	 * @return List of View Booking
 	 */
-	public static List<Book.VBook> getBooking() {
+	public List<Book.VBook> getBooking() {
 		List<Book.VBook> bookingList = new ArrayList<>();
 
 		try {
@@ -91,7 +93,7 @@ public class Controller {
 	 *
 	 * @return List of Barber
 	 */
-	public static List<Barber> getBarber() {
+	public List<Barber> getBarber() {
 		List<Barber> barberList = new ArrayList<>();
 
 		try {
@@ -122,7 +124,7 @@ public class Controller {
 	 *
 	 * @return List of Category Service
 	 */
-	public static List<CategoryService> getCategoryServices() {
+	public List<CategoryService> getCategoryServices() {
 		List<CategoryService> categoryServiceList = new ArrayList<>();
 
 		try {
@@ -156,7 +158,7 @@ public class Controller {
 	 * @param statusBooking
 	 * @param code
 	 */
-	public static void updateStatus(String statusBooking, String code) {
+	public void updateStatus(String statusBooking, String code) {
 		try {
 			connection = Connect.toDb();
 			statement = connection.createStatement();
@@ -177,7 +179,7 @@ public class Controller {
 	 * @param barber
 	 * @return boolean
 	 */
-	public static boolean getAvailableBookingByDateAndBarber(String dateTime, int barber) {
+	public boolean getAvailableBookingByDateAndBarber(String dateTime, int barber) {
 
 		try {
 			connection = Connect.toDb();
@@ -209,7 +211,7 @@ public class Controller {
 	 * @param name
 	 * @return List of View Booking
 	 */
-	public static List<Book.VBook> search(String name) {
+	public List<Book.VBook> search(String name) {
 		List<Book.VBook> bookingList = new ArrayList<>();
 
 		try {
@@ -249,7 +251,7 @@ public class Controller {
 	 *
 	 * @return Arrays String
 	 */
-	public static String[] getTime() {
+	public String[] getTime() {
 		return new String[]{
 				"1:00 PM",
 				"2:00 PM",

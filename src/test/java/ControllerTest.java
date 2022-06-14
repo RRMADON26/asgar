@@ -30,6 +30,9 @@ public class ControllerTest {
 		List<Book.VBook> list = new ArrayList<Book.VBook>();
 		Book.VBook vBook1 = new Book.VBook(1, "001", "Justin", "22 March 2022 01:00PM", "022983566", "BOOK", "John", "Premium Haircut");
 
+		//vBook1.setMobileNumber("09838383"); cara lain penulisan assign data
+		//Book.VBook vBook2 = new Book.VBook()
+
 		list.add(vBook1);
 
 		when(controller.getBooking()).thenReturn(list);
@@ -59,6 +62,20 @@ public class ControllerTest {
 		assertEquals(book.getDateTime(), tested.getDateTime());
 		assertEquals(book.getMobileNumber(), tested.getMobileNumber());
 		assertEquals(book.getStatus(), tested.getStatus());
+
+
+		///////////////////////////////
+		Book oBook = new Book();
+
+		oBook.setCode("0001");
+
+
+
+		oBook.getCode();
+
+
 	}
+
+
 
 }

@@ -44,8 +44,21 @@ public class Booking {
 	private JButton printButton;
 	private JTextField search;
 	private JButton searchButton;
+	private JButton button1;
+
 	private Controller controller = new Controller();
 
+	/*untuk membuka UI*/
+	public static void main(String[] args) {
+		JFrame frame = new JFrame("BookingForm");
+
+		frame.setContentPane(new Booking().panel);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
+		frame.setVisible(true);
+	}
+
+	/*Constructor */
 	public Booking() {
 
 		//formating date
@@ -58,15 +71,15 @@ public class Booking {
 		Book from = new Book();
 
 		//set default data
-		from.setServiceId(1);
-		from.setBarbedId(1);
-		from.setDateTime(simpleDateFormat.format(new Date()) + " " + controller.getTime()[0]);
+		from.setServiceId(1); // id 1  dari service ketika tidak pilih service
+		from.setBarbedId(1); // id 1  dari barber ketika tidak pilih barber
+		from.setDateTime(simpleDateFormat.format(new Date()) + " " + controller.getTime()[0]); // ketika tidak pilih tanggal dan jam --  inisialisasi tanggal sekarang -- format tanggal dan jam -- ambil jam dari index ke 0 dari class Controller
 
 		//define table
-		final BookingTableModel[] bookingTableModel = {new BookingTableModel(controller.getBooking())};
+		final BookingTableModel[] bookingTableModel = {new BookingTableModel(controller.getBooking())}; // untuk menampilkan data di table ketika UI nya di tampilkan
 
-		jTable.setModel(bookingTableModel[0]);
-		jTable.getAutoCreateRowSorter();
+		jTable.setModel(bookingTableModel[0]); //default setting table
+		jTable.getAutoCreateRowSorter(); // automatically generate sorting on table data
 
 		initialComponent();
 
@@ -74,18 +87,25 @@ public class Booking {
 		 * Override button action
 		 * This button used for send data to controller
 		 */
-		submitButton.addActionListener(new ActionListener() {
+		submitButton.addActionListener(new ActionListener() {  // fungsi ketika button di klik
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				if (date[0] == null) date[0] = simpleDateFormat.format(new Date());
-				if (time[0] == null) time[0] = controller.getTime()[0];
+				if (date[0] == null) {
+					date[0] = simpleDateFormat.format(new Date()); // validasi ketika  datanya null , akan assign new date
+				}
+
+				if (time[0] == null) {
+					time[0] = controller.getTime()[0];
+				}
 
 				try {
-					String dateTime = date[0] + " " + time[0];
-					if (!controller.getAvailableBookingByDateAndBarber(dateTime, from.getBarbedId())) {
+					String dateTime = date[0] + " " + time[0]; // formatting date and time
+
+					if (!controller.getAvailableBookingByDateAndBarber(dateTime, from.getBarbedId())) { // validasi ketika sudah ada jadwal booking di hari dan jam yang sama
 						JOptionPane.showMessageDialog(null, "Not Available");
 					} else {
+						/*membuat model Book sesuai request dari UI yang akan di masukan ke databse*/
 						from.setCode(UUID.randomUUID().toString());
 						from.setMobileNumber(mobileNumberTextField.getText());
 						from.setName(nameTextField.getText());
@@ -97,9 +117,9 @@ public class Booking {
 
 					}
 
-					jTable.revalidate();
+					jTable.revalidate(); // refresh table setelah insert data ke database
 
-					bookingTableModel[0] = new BookingTableModel(controller.getBooking());
+					bookingTableModel[0] = new BookingTableModel(controller.getBooking()); // ambil data ulang setalah insert data ke database
 					jTable.setModel(bookingTableModel[0]);
 
 
@@ -115,11 +135,11 @@ public class Booking {
 		barberComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JComboBox jComboBox = (JComboBox) e.getSource();
+				JComboBox jComboBox = (JComboBox) e.getSource(); // mengambil event ketika combobox dipilih
 
-				Barber barber = (Barber) jComboBox.getSelectedItem();
+				Barber barber = (Barber) jComboBox.getSelectedItem(); // binding data dari combobox yang di pilih ke model barber
 
-				from.setBarbedId(barber.getId());
+				from.setBarbedId(barber.getId()); // ambil ID barber dari data yg di pilih melalui combobox dan di SET ke model Book sebagai barber id
 			}
 		});
 
@@ -129,11 +149,11 @@ public class Booking {
 		serviceComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JComboBox jComboBox = (JComboBox) e.getSource();
+				JComboBox jComboBox = (JComboBox) e.getSource(); // mengambil event ketika combobox dipilih
 
-				CategoryService categoryService = (CategoryService) jComboBox.getSelectedItem();
+				CategoryService categoryService = (CategoryService) jComboBox.getSelectedItem();  // binding data dari combobox yang di pilih ke model Category
 
-				from.setServiceId(categoryService.getId());
+				from.setServiceId(categoryService.getId()); // ambil ID barber dari data yg di pilih melalui combobox dan di SET ke model Book sebagai barber id
 			}
 		});
 
@@ -143,8 +163,8 @@ public class Booking {
 		jDateChooser1.getDateEditor().addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
-				if ("date".equals(e.getPropertyName())) {
-					date[0] = simpleDateFormat.format(Date.from(jDateChooser1.getDate().toInstant()));
+				if ("date".equals(e.getPropertyName())) { // mengambil event date picker
+					date[0] = simpleDateFormat.format(Date.from(jDateChooser1.getDate().toInstant())); // format data dari date yang di pilih menjadi format "MM-dd-yyyy";
 				}
 
 			}
@@ -158,7 +178,7 @@ public class Booking {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				time[0] = timeComboBox.getSelectedItem().toString();
-			}
+			} // mengambil event dari combobox yang dipilih , dan set value ke variable time untuk di masukan ke database
 		});
 
 		/**
@@ -167,24 +187,24 @@ public class Booking {
 		jTable.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
+				if (e.getClickCount() == 2) { // memunculkan pop up ketika double click di table
 					JTable jTable = (JTable) e.getSource();
 
-					String[] options = {"Confirm", "Cancel Booking", "Quit"};
+					String[] options = {"Confirm", "Cancel Booking", "Quit"}; // setup button pada dialog
 
 					int result = JOptionPane.showOptionDialog(null, "Are you want to ?", "Confirmation Booking",
 							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
-							null, options, null);
-					if (result == JOptionPane.YES_OPTION) {
-						controller.updateStatus(CONFIRM.name(), jTable.getValueAt(jTable.getSelectedRow(), 0).toString());
-					} else if (result == JOptionPane.NO_OPTION) {
-						controller.updateStatus(CANCELLED.name(), jTable.getValueAt(jTable.getSelectedRow(), 0).toString());
+							null, options, null); // setup tampilan dialog
+					if (result == JOptionPane.YES_OPTION) { // jika pilih tombol confirm
+						controller.updateStatus(CONFIRM.name(), jTable.getValueAt(jTable.getSelectedRow(), 0).toString()); // update status data yang dipilh menjadi confirm
+					} else if (result == JOptionPane.NO_OPTION) { //jika pilih tombol Cancel booking
+						controller.updateStatus(CANCELLED.name(), jTable.getValueAt(jTable.getSelectedRow(), 0).toString()); // update status data yang dipilh menjadi cancelled
 					}
 
 				}
 
-				bookingTableModel[0] = new BookingTableModel(controller.getBooking());
-				jTable.setModel(bookingTableModel[0]);
+				bookingTableModel[0] = new BookingTableModel(controller.getBooking()); // refersh data yang telah di update , untuk di tampilkan kembali di table
+				jTable.setModel(bookingTableModel[0]); // default settings table , ketika refresh data
 
 			}
 		});
@@ -196,7 +216,7 @@ public class Booking {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					jTable.print(JTable.PrintMode.FIT_WIDTH, null, null);
+					jTable.print(JTable.PrintMode.FIT_WIDTH, null, null); // memunculkan print , dari table
 				} catch (PrinterException ex) {
 					ex.printStackTrace();
 				}
@@ -206,27 +226,18 @@ public class Booking {
 		searchButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				bookingTableModel[0] = new BookingTableModel(controller.search(search.getText()));
-				jTable.setModel(bookingTableModel[0]);
+				bookingTableModel[0] = new BookingTableModel(controller.search(search.getText())); // mencari data sesuai yang di input pada kolom pencarian ke database berdasarkan nama customer
+				jTable.setModel(bookingTableModel[0]); // default settings table , ketika refresh data
 			}
 		});
 
 		clearButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				nameTextField.setText("");
-				mobileNumberTextField.setText("");
+				nameTextField.setText(""); // mengkosongkan textfiled nama
+				mobileNumberTextField.setText("");  // mengkosongkan texfield mobile number
 			}
 		});
-	}
-
-	public static void main(String[] args) {
-		JFrame frame = new JFrame("BookingForm");
-
-		frame.setContentPane(new Booking().panel);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);
 	}
 
 	private void initialComponent() {
@@ -248,7 +259,7 @@ public class Booking {
 	 * setup layout table
 	 */
 	private static class BookingTableModel extends AbstractTableModel {
-		private final String[] columnNames = {"Code", "Name", "Date Time", "Mobile Number", "Status", "Barber Name", "Service"};
+		private final String[] columnNames = {"Code", "Name", "Date Time", "Mobile Number", "Status", "Barber Name", "Service"}; // setup column untuk table
 
 		private List<Book.VBook> bookList;
 
@@ -314,8 +325,8 @@ public class Booking {
 	 * pre define JdateChooser Component
 	 */
 	public void createUIComponents() {
-		jDateChooser1 = new JDateChooser(Date.from(Instant.now()));
-		jDateChooser1.setDateFormatString("dd MMMM yyyy");
+		jDateChooser1 = new JDateChooser(Date.from(Instant.now())); // otomatis memilih tanggal pada date picker ketika tampilan awal di buka
+		jDateChooser1.setDateFormatString("dd MMMM yyyy"); // mem-format tanggal menjadi dd MMMM yyyy
 
 	}
 }
